@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KhabarExpress বাঞ্ছারামপুর — উপজেলার সব বাজার ও দোকানদার রেজিস্ট্রেশন প্ল্যাটফর্ম</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '"Hind Siliguri"', 'sans-serif'],
+            bengali: ['"Hind Siliguri"', 'sans-serif'],
+          },
+          colors: {
+            keeta: {
+              yellow: '#FFD000',
+              yellowHover: '#F2C500',
+              green: '#00B14F',
+              greenDark: '#009140',
+              greenLight: '#E6F7EE',
+              dark: '#0F172A'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    @keyframes pulseBeacon {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 177, 79, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 9px rgba(0, 177, 79, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 177, 79, 0); }
+    }
+    .live-dot { animation: pulseBeacon 2s infinite; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-xs">
+    <div class="max-w-[1380px] mx-auto px-3 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        
+        <!-- Brand Logo + Master Bazaar Selector -->
+        <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+          <a href="#" onclick="switchMainView('customer'); resetFilters(); return false;" class="flex items-center gap-2.5 shrink-0 group">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-keeta-yellow flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform relative">
+              <svg class="w-6 h-6 text-keeta-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7H3a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2Z"/>
+                <path d="M2 17h20"/><path d="M4 20h16"/>
+              </svg>
+              <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-keeta-green border-2 border-white"></span>
+            </div>
+            <div>
+              <span class="text-lg sm:text-xl font-extrabold tracking-tight text-keeta-dark block leading-none">Khabar<span class="text-keeta-green">Express</span></span>
+              <span class="text-[11px] font-bold text-slate-500 block mt-0.5">বাঞ্ছারামপুর উপজেলা (সব বাজার)</span>
+            </div>
+          </a>
+
+          <!-- Comprehensive Bazaar & Union Selector Dropdown -->
+          <div class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200/70 transition px-3 py-2 rounded-xl border border-slate-200/80 flex-1 max-w-[270px] sm:max-w-[310px]">
+            <svg class="w-4 h-4 text-keeta-green shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+            </svg>
+            <div class="min-w-0 flex-1">
+              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block leading-none">আপনার বাজার / ইউনিয়ন</span>
+              <select id="headerBazaarSelect" onchange="handleHeaderBazaarChange()" class="bg-transparent text-xs sm:text-sm font-extrabold text-slate-800 w-full focus:outline-none cursor-pointer truncate">
+                <!-- Populated dynamically with All 14 Bazaars -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Primary Navigation View Switcher Tabs -->
+        <div class="flex items-center gap-1.5 sm:gap-2 w-full lg:w-auto justify-between sm:justify-end overflow-x-auto no-scrollbar pt-1 lg:pt-0">
+          <button onclick="switchMainView('customer')" id="tabBtn-customer" class="main-nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-keeta-dark text-keeta-yellow transition shrink-0 flex items-center gap-1.5">
+            <span>🍔</span>
+            <span>কাস্টমার ভিউ (Order Food)</span>
+          </button>
+
+          <button onclick="switchMainView('dokandar')" id="tabBtn-dokandar" class="main-nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-keeta-green hover:bg-keeta-greenDark text-white shadow-xs transition shrink-0 flex items-center gap-1.5">
+            <span>🏪</span>
+            <span>দোকানদার রেজিস্ট্রেশন</span>
+          </button>
+
+          <button onclick="switchMainView('bazaars')" id="tabBtn-bazaars" class="main-nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-slate-100 hover:bg-slate-200 text-slate-800 transition shrink-0 flex items-center gap-1.5">
+            <span>🗺️</span>
+            <span>সব বাজার ও এলাকা (১৪+)</span>
+          </button>
+
+          <!-- Live Order Track Button -->
+          <button onclick="openTrackingModal()" class="px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-keeta-green text-xs font-extrabold hover:bg-emerald-100 transition shrink-0 flex items-center gap-1.5">
+            <span id="liveTrackBeacon" class="hidden w-2 h-2 rounded-full bg-keeta-green live-dot"></span>
+            <span>🛵 ট্র্যাক</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ======================================================================= -->
+  <!-- VIEW 1: CUSTOMER VIEW (ORDER FOOD ACROSS ALL BANCHARAMPUR BAZAARS)       -->
+  <!-- ======================================================================= -->
+  <div id="view-customer" class="main-view flex-1 flex flex-col">
+    
+    <!-- Hero Banner -->
+    <section class="bg-gradient-to-r from-keeta-yellow via-[#FFE047] to-[#BEF264] border-b border-yellow-300/80">
+      <div class="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-9">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div class="lg:col-span-8 space-y-3">
+            <div class="inline-flex flex-wrap items-center gap-2">
+              <span class="bg-keeta-dark text-keeta-yellow text-xs font-extrabold px-3 py-1 rounded-full">🇧🇩 বাঞ্ছারামপুর পৌরসভা ও ১৩টি ইউনিয়নে সার্ভিস চালু</span>
+              <span class="bg-white/90 text-keeta-green text-xs font-extrabold px-3 py-1 rounded-full">⚡ ২০–৪০ মিনিটে হোম ডেলিভারি</span>
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-extrabold text-keeta-dark leading-tight">
+              পুরো বাঞ্ছারামপুর উপজেলার <span class="text-keeta-green underline decoration-wavy decoration-2">সব বাজার ও ইউনিয়নে</span> হোম ডেলিভারি!
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-800 font-medium max-w-2xl">
+              ছয়ফুল্লাকান্দি, বাঞ্ছারামপুর সদর, কড়িকান্দি, রূপসদী, উজানচর, ফরদাবাদসহ উপজেলার সব বাজারের সেরা ফাস্টফুড, বিরিয়ানি ও মিষ্টির দোকান এখন একটি অ্যাপেই।
+            </p>
+            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+              <button onclick="applyPromoCode()" class="bg-white hover:bg-slate-50 text-slate-900 border-2 border-dashed border-keeta-green font-extrabold text-xs px-3.5 py-2 rounded-xl shadow-2xs transition">
+                🎉 প্রোমো কোড: <span class="text-keeta-green">FIRSTFREE</span> (ডেলিভারি ফ্রি — ক্লিক করুন)
+              </button>
+              <button onclick="switchMainView('dokandar')" class="bg-keeta-dark hover:bg-slate-800 text-keeta-yellow font-extrabold text-xs px-4 py-2.5 rounded-xl shadow-xs transition">
+                + আপনার দোকান যুক্ত করুন
+              </button>
+            </div>
+          </div>
+
+          <!-- Right Quick Stats Card -->
+          <div class="lg:col-span-4 bg-white/95 backdrop-blur-xs rounded-3xl p-4 sm:p-5 shadow-md border border-white grid grid-cols-3 gap-2 text-center">
+            <div class="p-2 rounded-2xl bg-amber-50">
+              <span class="text-xl sm:text-2xl font-extrabold text-slate-900 block">১৪+</span>
+              <span class="text-[11px] font-bold text-slate-600">প্রধান বাজার</span>
+            </div>
+            <div class="p-2 rounded-2xl bg-emerald-50">
+              <span id="heroTotalShopsCount" class="text-xl sm:text-2xl font-extrabold text-keeta-green block">১২+</span>
+              <span class="text-[11px] font-bold text-slate-600">পার্টনার দোকান</span>
+            </div>
+            <div class="p-2 rounded-2xl bg-slate-100">
+              <span class="text-xl sm:text-2xl font-extrabold text-slate-900 block">৳৩০</span>
+              <span class="text-[11px] font-bold text-slate-600">শুরু ডেলিভারি</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bazaar Quick-Filter Pills Bar -->
+    <section class="bg-white border-b border-slate-200/80 sticky top-[68px] z-30">
+      <div class="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-3 space-y-2.5">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-xs font-extrabold text-slate-700">📍 বাজার অনুযায়ী ফিল্টার করুন:</span>
+          <button onclick="switchMainView('bazaars')" class="text-xs font-extrabold text-keeta-green hover:underline">সব ১৪টি বাজারের তালিকা দেখুন →</button>
+        </div>
+        <div id="bazaarQuickPills" class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-0.5">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Main 2-Column Workspace (Restaurants/Menus + Sticky Cart) -->
+    <main class="flex-1 max-w-[1380px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div class="flex flex-col lg:flex-row gap-6 items-start">
+
+        <!-- Left Column: Search, Category & Shops -->
+        <div class="w-full lg:w-[68%] space-y-6">
+          
+          <!-- Search & Food Category Filter -->
+          <div class="bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs space-y-3">
+            <div class="relative">
+              <svg class="w-4 h-4 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input type="text" id="customerSearchInput" oninput="handleSearch(this.value)" placeholder="দোকান বা খাবারের নাম লিখুন (যেমন: Mr. Ripon, বার্গার, বিরিয়ানি, রসমালাই)..." class="w-full pl-10 pr-4 py-2.5 bg-slate-100 rounded-xl text-xs sm:text-sm font-medium focus:outline-none focus:bg-white focus:ring-2 focus:ring-keeta-yellow" />
+            </div>
+
+            <div id="foodCategoryPills" class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+
+          <!-- Active Bazaar Header -->
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 id="activeBazaarHeading" class="text-lg sm:text-xl font-extrabold text-slate-900">সকল বাজারের রেস্টুরেন্ট ও ফাস্টফুড শপ</h2>
+              <p id="activeBazaarSubheading" class="text-xs text-slate-500">যেকোনো দোকানে ক্লিক করে সম্পূর্ণ মেনু দেখুন ও অর্ডার করুন</p>
+            </div>
+            <span id="shopResultCount" class="bg-slate-200/80 text-slate-800 text-xs font-extrabold px-3 py-1 rounded-lg"></span>
+          </div>
+
+          <!-- Shops Grid -->
+          <div id="shopsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Rendered dynamically -->
+          </div>
+
+          <!-- Quick Popular Dishes -->
+          <div class="pt-2 space-y-3">
+            <h3 class="text-lg font-extrabold text-slate-900">সরাসরি জনপ্রিয় খাবার অর্ডার করুন</h3>
+            <div id="popularDishesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Sticky Cart & Guest Checkout -->
+        <aside id="cartSidebar" class="w-full lg:w-[32%] lg:sticky lg:top-36 bg-white rounded-3xl border border-slate-200/90 shadow-lg overflow-hidden">
+          <div class="bg-keeta-dark text-white px-5 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <span class="w-9 h-9 rounded-xl bg-keeta-yellow text-keeta-dark flex items-center justify-center text-lg font-bold">🛒</span>
+              <div>
+                <h3 class="font-extrabold text-base leading-tight">আপনার অর্ডার কার্ট</h3>
+                <p id="cartSelectedBazaarText" class="text-[11px] text-slate-300">ডেলিভারি এলাকা: ছয়ফুল্লাকান্দি বাজার</p>
+              </div>
+            </div>
+            <span id="cartBadgeCount" class="bg-keeta-green text-white text-xs font-extrabold px-2.5 py-1 rounded-full">০ আইটেম</span>
+          </div>
+
+          <div class="p-5 space-y-4 max-h-[calc(100vh-12rem)] overflow-y-auto">
+            <!-- Empty Cart -->
+            <div id="emptyCartState" class="text-center py-8 space-y-2">
+              <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-3xl">🍔</div>
+              <h4 class="font-extrabold text-sm text-slate-800">কার্ট এখন খালি!</h4>
+              <p class="text-xs text-slate-500">আপনার বাজারের যেকোনো দোকান থেকে খাবার যোগ করুন।</p>
+            </div>
+
+            <!-- Cart Items -->
+            <div id="cartItemsContainer" class="hidden space-y-2.5"></div>
+
+            <!-- Billing & Guest Checkout -->
+            <div id="cartCheckoutSection" class="hidden space-y-4 pt-2 border-t border-slate-100">
+              <div class="bg-keeta-greenLight border border-keeta-green/25 rounded-2xl p-3 flex items-center justify-between gap-2">
+                <div>
+                  <span class="text-xs font-extrabold text-keeta-green block">🎉 FIRSTFREE কুপন</span>
+                  <span class="text-[11px] text-slate-600">প্রথম অর্ডারে ডেলিভারি ফ্রি</span>
+                </div>
+                <button id="cartPromoBtn" onclick="togglePromoCode()" class="bg-keeta-green hover:bg-keeta-greenDark text-white text-xs font-bold px-3 py-1.5 rounded-xl transition">প্রয়োগ করুন</button>
+              </div>
+
+              <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200/80 space-y-1.5 text-xs sm:text-sm">
+                <div class="flex justify-between text-slate-600">
+                  <span>খাবারের মূল্য</span>
+                  <span id="cartSubtotalText" class="font-bold text-slate-800">৳০</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                  <span>ডেলিভারি চার্জ</span>
+                  <span id="cartDeliveryText" class="font-bold text-slate-800">৳৩০</span>
+                </div>
+                <div id="cartDiscountRow" class="hidden justify-between text-keeta-green font-bold">
+                  <span>প্রোমো ছাড় (FIRSTFREE)</span>
+                  <span id="cartDiscountText">-৳৩০</span>
+                </div>
+                <div class="border-t border-slate-200 pt-2 flex justify-between text-base font-extrabold text-slate-900">
+                  <span>সর্বমোট বিল</span>
+                  <span id="cartTotalText">৳০</span>
+                </div>
+              </div>
+
+              <!-- Guest Checkout Form -->
+              <form onsubmit="placeCustomerOrder(event)" class="space-y-2.5">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs font-extrabold text-slate-800">দ্রুত ডেলিভারি তথ্য (Guest Checkout)</span>
+                  <span class="text-[10px] font-bold bg-emerald-50 text-keeta-green px-2 py-0.5 rounded">লগইন ছাড়াই</span>
+                </div>
+                <input type="text" id="orderCustName" required placeholder="আপনার পূর্ণ নাম *" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-keeta-green" />
+                <input type="tel" id="orderCustPhone" required placeholder="মোবাইল নম্বর (017XXXXXXXX) *" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-keeta-green" />
+                
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-600 mb-1">ডেলিভারি বাজার / ইউনিয়ন *</label>
+                  <select id="checkoutBazaarSelect" onchange="syncCheckoutBazaar()" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:border-keeta-green">
+                    <!-- Populated dynamically -->
+                  </select>
+                </div>
+
+                <textarea id="orderCustAddress" rows="2" required placeholder="গ্রাম / পাড়া / বাড়ির নাম ও পরিচিত স্থান লিখুন *" class="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-keeta-green"></textarea>
+
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="cursor-pointer">
+                    <input type="radio" name="payOption" value="COD" checked class="peer sr-only" />
+                    <div class="p-2 rounded-xl border border-slate-300 peer-checked:border-keeta-green peer-checked:bg-keeta-greenLight text-center text-xs font-extrabold">💵 Cash on Delivery</div>
+                  </label>
+                  <label class="cursor-pointer">
+                    <input type="radio" name="payOption" value="bKash" class="peer sr-only" />
+                    <div class="p-2 rounded-xl border border-slate-300 peer-checked:border-pink-600 peer-checked:bg-pink-50 text-center text-xs font-extrabold">📱 বিকাশ / নগদ</div>
+                  </label>
+                </div>
+
+                <button type="submit" class="w-full bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark font-extrabold py-3.5 rounded-2xl shadow-md transition active:scale-[0.99] text-sm">
+                  অর্ডার কনফার্ম করুন →
+                </button>
+              </form>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- VIEW 2: SELF-SERVICE DOKANDAR / MERCHANT REGISTRATION PORTAL            -->
+  <!-- ======================================================================= -->
+  <div id="view-dokandar" class="main-view hidden flex-1">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+      
+      <!-- Portal Header Banner -->
+      <div class="bg-gradient-to-r from-keeta-green to-emerald-800 text-white rounded-3xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+        <div class="max-w-2xl space-y-2.5 relative z-10">
+          <span class="bg-keeta-yellow text-keeta-dark text-xs font-extrabold px-3 py-1 rounded-full">🏪 বাঞ্ছারামপুর মার্চেন্ট ও দোকানদার পোর্টাল</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight">আপনার ফাস্টফুড, রেস্টুরেন্ট বা মিষ্টির দোকান ফ্রি-তে রেজিস্ট্রেশন করুন!</h1>
+          <p class="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+            বাঞ্ছারামপুর পৌরসভা বা যেকোনো ইউনিয়নের বাজারে আপনার দোকান থাকলে আজই যুক্ত হোন। নিচের ফর্মটি পূরণ করলে <strong>সাথে সাথেই আপনার দোকান কাস্টমার অ্যাপ ও ওয়েবসাইটে লাইভ হয়ে যাবে!</strong>
+          </p>
+        </div>
+        <span class="hidden sm:block text-8xl absolute right-8 bottom-3 opacity-25 select-none">🏪</span>
+      </div>
+
+      <!-- Success Live Confirmation Banner (Shown immediately after registering!) -->
+      <div id="dokandarSuccessBanner" class="hidden bg-emerald-50 border-2 border-keeta-green rounded-3xl p-5 sm:p-6 shadow-md space-y-3">
+        <div class="flex items-start gap-3">
+          <div class="w-11 h-11 rounded-2xl bg-keeta-green text-white flex items-center justify-center text-xl font-bold shrink-0">✓</div>
+          <div class="space-y-1">
+            <h3 class="text-lg font-extrabold text-slate-900">অভিনন্দন! আপনার দোকান সফলভাবে রেজিস্ট্রেশন ও লাইভ হয়েছে! 🎉</h3>
+            <p id="dokandarSuccessMsg" class="text-xs sm:text-sm text-slate-700 font-medium"></p>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-3 pt-1">
+          <button id="viewNewShopBtn" onclick="goToNewlyRegisteredShop()" class="bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark font-extrabold text-xs sm:text-sm px-5 py-2.5 rounded-xl shadow-xs transition">
+            কাস্টমার ভিউতে আপনার দোকান দেখুন →
+          </button>
+          <button onclick="document.getElementById('dokandarSuccessBanner').classList.add('hidden')" class="text-xs font-bold text-slate-500 hover:text-slate-800 px-3 py-2">
+            বন্ধ করুন
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Left 7 Cols: Self-Service Registration Form -->
+        <div class="lg:col-span-7 bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm">
+          <h2 class="text-lg font-extrabold text-slate-900 border-b border-slate-100 pb-3 mb-5">দোকান নিবন্ধন ফর্ম (Shop Registration Form)</h2>
+          
+          <form id="dokandarRegForm" onsubmit="handleDokandarRegistration(event)" class="space-y-4">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">দোকানের নাম (Shop Name) *</label>
+                <input type="text" id="regShopName" required placeholder="যেমন: ভাই ভাই ফাস্টফুড কর্নার" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-keeta-green focus:bg-white" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">মালিকের নাম (Owner Name) *</label>
+                <input type="text" id="regOwnerName" required placeholder="যেমন: মোঃ কামাল হোসেন" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-keeta-green focus:bg-white" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">মোবাইল ও হোয়াটসঅ্যাপ নম্বর *</label>
+                <input type="tel" id="regMobile" required placeholder="017XXXXXXXX" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium focus:outline-none focus:border-keeta-green focus:bg-white" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-extrabold text-slate-700 mb-1">দোকানের ধরন (Category) *</label>
+                <select id="regCategory" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-keeta-green">
+                  <option value="burger">🍔 ফাস্টফুড ও বার্গার (Fastfood)</option>
+                  <option value="biryani">🍛 রেস্টুরেন্ট ও বিরিয়ানি (Biryani/Hotel)</option>
+                  <option value="pizza">🍕 পিৎজা ও চাইনিজ (Pizza & Chinese)</option>
+                  <option value="sweets">🍮 মিষ্টির দোকান ও বেকারি (Sweets & Bakery)</option>
+                  <option value="drinks">☕ ক্যাফে ও চা-কফি (Cafe & Drinks)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-extrabold text-slate-700 mb-1">বাজার / ইউনিয়ন নির্বাচন করুন (Bazaar Location) *</label>
+              <select id="regBazaarSelect" required class="w-full px-3.5 py-2.5 bg-amber-50/70 border border-amber-300 rounded-xl text-sm font-extrabold text-slate-900 focus:outline-none focus:border-keeta-green">
+                <!-- Populated with all 14 Bancharampur Bazaars -->
+              </select>
+            </div>
+
+            <!-- Quick Menu Items to List Immediately -->
+            <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold text-slate-800">আপনার দোকানের ২টি জনপ্রিয় খাবারের নাম ও দাম দিন *</span>
+                <span class="text-[10px] font-bold text-keeta-green bg-emerald-100 px-2 py-0.5 rounded">সাথে সাথে লাইভ হবে</span>
+              </div>
+
+              <div class="grid grid-cols-12 gap-2">
+                <input type="text" id="regItem1Name" required placeholder="১ম খাবারের নাম (যেমন: স্পেশাল বার্গার)" class="col-span-8 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-keeta-green" />
+                <input type="number" id="regItem1Price" required min="10" placeholder="দাম (৳)" class="col-span-4 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-keeta-green" />
+              </div>
+
+              <div class="grid grid-cols-12 gap-2">
+                <input type="text" id="regItem2Name" required placeholder="২য় খাবারের নাম (যেমন: চিকেন ফ্রাই)" class="col-span-8 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-keeta-green" />
+                <input type="number" id="regItem2Price" required min="10" placeholder="দাম (৳)" class="col-span-4 px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-keeta-green" />
+              </div>
+            </div>
+
+            <!-- 2-Year Partnership Agreement Checkbox -->
+            <label class="flex items-start gap-2.5 bg-emerald-50/70 p-3.5 rounded-2xl border border-emerald-200 cursor-pointer">
+              <input type="checkbox" required checked class="mt-0.5 w-4 h-4 accent-keeta-green shrink-0" />
+              <span class="text-xs text-slate-700 leading-relaxed">
+                আমি <strong>KhabarExpress বাঞ্ছারামপুর</strong>-এর ১০%–১২% কমিশন ভিত্তিক এবং <strong>২ (দুই) বছরের পার্টনারশিপ চুক্তির</strong> শর্তাবলিতে সম্মত আছি। (কোনো অগ্রিম বা মাসিক ফি প্রযোজ্য নয়)।
+              </span>
+            </label>
+
+            <button type="submit" class="w-full bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark font-extrabold py-3.5 rounded-2xl shadow-md transition active:scale-[0.99] text-sm">
+              দোকান রেজিস্ট্রেশন সম্পন্ন করুন ও লাইভ করুন 🚀
+            </button>
+          </form>
+        </div>
+
+        <!-- Right 5 Cols: Merchant Benefits & Registered Shops List -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="bg-white rounded-3xl p-6 border border-slate-200/90 shadow-sm space-y-3.5">
+            <h3 class="font-extrabold text-base text-slate-900">কেন KhabarExpress-এ যুক্ত হবেন?</h3>
+            <ul class="space-y-2.5 text-xs text-slate-700">
+              <li class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-keeta-greenLight text-keeta-green flex items-center justify-center font-bold shrink-0">১</span>
+                <span><strong>০ টাকা রেজিস্ট্রেশন ফি:</strong> দোকান যুক্ত করতে কোনো অগ্রিম টাকা লাগবে না।</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-keeta-greenLight text-keeta-green flex items-center justify-center font-bold shrink-0">২</span>
+                <span><strong>তাৎক্ষণিক নগদ টাকা (Instant Cash):</strong> রাইডার খাবার নেওয়ার সময়ই কমিশন বাদ দিয়ে নগদ টাকা দোকানদারকে দিয়ে যাবে।</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-keeta-greenLight text-keeta-green flex items-center justify-center font-bold shrink-0">৩</span>
+                <span><strong>পুরো উপজেলায় কাস্টমার:</strong> আপনার বাজারের বাইরের গ্রাম ও ইউনিয়নের কাস্টমাররাও আপনার খাবার অর্ডার করতে পারবে।</span>
+              </li>
+              <li class="flex items-start gap-2.5">
+                <span class="w-5 h-5 rounded-full bg-keeta-greenLight text-keeta-green flex items-center justify-center font-bold shrink-0">৪</span>
+                <span><strong>ফ্রি ডিজিটাল মার্কেটিং:</strong> ফেসবুক ও অ্যাপে আপনার দোকানের খাবারের প্রচার আমরা করব।</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Recently Registered Merchants Feed -->
+          <div class="bg-white rounded-3xl p-5 border border-slate-200/90 shadow-sm space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="font-extrabold text-sm text-slate-900">সাম্প্রতিক নিবন্ধিত দোকানসমূহ</h4>
+              <span class="text-[11px] font-bold text-keeta-green">Live Verified</span>
+            </div>
+            <div id="recentRegisteredList" class="space-y-2 max-h-64 overflow-y-auto no-scrollbar">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- VIEW 3: ALL BAZAARS & UNIONS COVERAGE DIRECTORY (14+ BAZAARS)           -->
+  <!-- ======================================================================= -->
+  <div id="view-bazaars" class="main-view hidden flex-1">
+    <div class="max-w-[1380px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      
+      <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="space-y-1.5">
+          <span class="bg-keeta-yellow text-keeta-dark text-xs font-extrabold px-3 py-1 rounded-full">🗺️ সম্পূর্ণ বাঞ্ছারামপুর উপজেলা কভারেজ</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">বাঞ্ছারামপুর পৌরসভা ও ১৩টি ইউনিয়নের সব বাজার</h1>
+          <p class="text-xs sm:text-sm text-slate-500">যেকোনো বাজারে ক্লিক করে সেই এলাকার রেস্টুরেন্ট ও ফাস্টফুড দোকানগুলো দেখুন</p>
+        </div>
+        <button onclick="switchMainView('dokandar')" class="bg-keeta-green hover:bg-keeta-greenDark text-white font-extrabold text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-sm shrink-0 transition">
+          + আপনার বাজারের দোকান যুক্ত করুন
+        </button>
+      </div>
+
+      <!-- 14 Bazaars Interactive Directory Grid -->
+      <div id="allBazaarsDirectoryGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Populated dynamically with all 14 bazaars -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RESTAURANT MENU MODAL -->
+  <div id="shopMenuModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[86vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-keeta-yellow to-amber-300 p-5 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-3">
+          <span id="modalShopEmoji" class="w-14 h-14 rounded-2xl bg-white flex items-center justify-center text-3xl shadow-xs">🍔</span>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="modalShopName" class="text-lg sm:text-xl font-extrabold text-slate-900">Mr. Ripon Fastfood</h3>
+              <span id="modalShopRating" class="bg-slate-900 text-keeta-yellow text-xs font-extrabold px-2 py-0.5 rounded-lg">4.9 ★</span>
+            </div>
+            <p id="modalShopBazaar" class="text-xs font-bold text-slate-800 mt-0.5">📍 ছয়ফুল্লাকান্দি বাজার</p>
+          </div>
+        </div>
+        <button onclick="closeShopModal()" class="w-8 h-8 rounded-full bg-slate-900/15 hover:bg-slate-900/25 font-extrabold text-sm flex items-center justify-center">✕</button>
+      </div>
+
+      <div id="modalShopMenuContainer" class="p-5 overflow-y-auto space-y-3 flex-1 bg-slate-50">
+        <!-- Menu items rendered dynamically -->
+      </div>
+
+      <div class="px-5 py-3.5 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
+        <span class="text-xs font-semibold text-slate-500">আইটেম যোগ করে ডানপাশের কার্ট থেকে অর্ডার কনফার্ম করুন</span>
+        <button onclick="closeShopModal()" class="bg-keeta-dark text-keeta-yellow text-xs font-extrabold px-5 py-2.5 rounded-xl">সম্পন্ন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE ORDER TRACKING MODAL -->
+  <div id="trackingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5 relative">
+      <button onclick="closeTrackingModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 font-bold">✕</button>
+      <div class="text-center space-y-1">
+        <span class="inline-block bg-emerald-100 text-keeta-green text-xs font-extrabold px-3 py-1 rounded-full">লাইভ অর্ডার ট্র্যাকিং</span>
+        <h3 class="text-xl font-extrabold text-slate-900">আপনার খাবার পথে আছে!</h3>
+        <p id="trackModalOrderId" class="text-xs font-bold text-slate-500">অর্ডার আইডি: #KE-3015</p>
+      </div>
+
+      <div class="bg-gradient-to-r from-keeta-yellow/40 to-emerald-50 border border-yellow-300 rounded-2xl p-4 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold text-slate-600 block">গন্তব্য বাজার</span>
+          <span id="trackModalDestination" class="text-sm font-extrabold text-slate-900 block">ছয়ফুল্লাকান্দি বাজার</span>
+          <span class="text-[11px] font-semibold text-keeta-green block mt-0.5">🛵 রাইডার: সাকিব হাসান (018XX-XXXXXX)</span>
+        </div>
+        <div class="text-3xl">🛵</div>
+      </div>
+
+      <div class="space-y-3.5 pl-1">
+        <div class="flex items-start gap-3">
+          <div class="w-6 h-6 rounded-full bg-keeta-green text-white flex items-center justify-center text-xs font-bold shrink-0">✓</div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">অর্ডার কনফার্ম হয়েছে</h4>
+            <p class="text-[11px] text-slate-500">রেস্টুরেন্ট অর্ডারটি গ্রহণ করেছে</p>
+          </div>
+        </div>
+        <div id="trStep2" class="flex items-start gap-3 opacity-45">
+          <div id="trStep2Dot" class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0">২</div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">খাবার তৈরি হচ্ছে (Cooking)</h4>
+            <p class="text-[11px] text-slate-500">গরম ও তাজা খাবার প্যাক করা হচ্ছে</p>
+          </div>
+        </div>
+        <div id="trStep3" class="flex items-start gap-3 opacity-45">
+          <div id="trStep3Dot" class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0">৩</div>
+          <div>
+            <h4 class="text-xs sm:text-sm font-extrabold text-slate-900">রাইডার ডেলিভারির পথে (On the Way)</h4>
+            <p class="text-[11px] text-slate-500">খাবার বুঝে নিয়ে ক্যাশ পেমেন্ট করুন</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-2 border-t border-slate-100 flex items-center gap-2">
+        <button onclick="advanceTrackStep()" id="advanceTrackBtn" class="flex-1 bg-keeta-dark text-keeta-yellow text-xs font-extrabold py-3 rounded-xl">পরবর্তী ধাপ দেখুন (Demo) →</button>
+        <button onclick="closeTrackingModal()" class="px-4 py-3 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl">বন্ধ করুন</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Banner -->
+  <div id="toastBanner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-keeta-dark text-keeta-yellow text-xs sm:text-sm font-bold px-5 py-3 rounded-full shadow-xl opacity-0 pointer-events-none transition-opacity duration-300">
+    কার্টে যোগ হয়েছে!
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. ALL 14 MAJOR BAZAARS & UNIONS OF BANCHARAMPUR UPAZILA
+    // =========================================================================
+    const bancharampurBazaars = [
+      { id: 'all', name: 'সকল বাজার (All Bancharampur)', shortName: 'সব বাজার', en: 'All Bazaars', fee: 30, time: '২০-৪০ মিনিট', union: 'পুরো বাঞ্ছারামপুর উপজেলা' },
+      { id: 'sadar', name: 'বাঞ্ছারামপুর সদর ও পৌরসভা বাজার', shortName: 'বাঞ্ছারামপুর সদর', en: 'Bancharampur Sadar & Pourashava', fee: 30, time: '২০-২৫ মিনিট', union: 'বাঞ্ছারামপুর পৌরসভা' },
+      { id: 'chaifullahkandi', name: 'ছয়ফুল্লাকান্দি বাজার', shortName: 'ছয়ফুল্লাকান্দি বাজার', en: 'Chaifullahkandi Bazar', fee: 30, time: '২০-২৫ মিনিট', union: 'ছয়ফুল্লাকান্দি ইউনিয়ন' },
+      { id: 'karikandi', name: 'কড়িকান্দি বাজার ও ফেরিঘাট', shortName: 'কড়িকান্দি বাজার', en: 'Karikandi Bazar & Ferry Ghat', fee: 35, time: '২৫-৩০ মিনিট', union: 'দরিকান্দি / কড়িকান্দি' },
+      { id: 'rupshadi', name: 'রূপসদী বাজার', shortName: 'রূপসদী বাজার', en: 'Rupshadi Bazar', fee: 35, time: '২৫-৩০ মিনিট', union: 'রূপসদী ইউনিয়ন' },
+      { id: 'ujanchar', name: 'উজানচর বাজার', shortName: 'উজানচর বাজার', en: 'Ujanchar Bazar', fee: 35, time: '২৫-৩০ মিনিট', union: 'উজানচর ইউনিয়ন' },
+      { id: 'fardabad', name: 'ফরদাবাদ বাজার', shortName: 'ফরদাবাদ বাজার', en: 'Fardabad Bazar', fee: 45, time: '৩০-৪০ মিনিট', union: 'ফরদাবাদ ইউনিয়ন' },
+      { id: 'darikandi', name: 'দরিকান্দি বাজার', shortName: 'দরিকান্দি বাজার', en: 'Darikandi Bazar', fee: 35, time: '২৫-৩০ মিনিট', union: 'দরিকান্দি ইউনিয়ন' },
+      { id: 'sonarampur', name: 'সোনারামপুর বাজার', shortName: 'সোনারামপুর বাজার', en: 'Sonarampur Bazar', fee: 40, time: '৩০-৩৫ মিনিট', union: 'সোনারামপুর ইউনিয়ন' },
+      { id: 'ayubpur', name: 'আইয়ুবপুর বাজার', shortName: 'আইয়ুবপুর বাজার', en: 'Ayubpur Bazar', fee: 40, time: '৩০-৩৫ মিনিট', union: 'আইয়ুবপুর ইউনিয়ন' },
+      { id: 'tejkhali', name: 'তেজখালী বাজার', shortName: 'তেজখালী বাজার', en: 'Tejkhali Bazar', fee: 45, time: '৩০-৪০ মিনিট', union: 'তেজখালী ইউনিয়ন' },
+      { id: 'pahariakandi', name: 'পাহাড়িয়াকান্দি বাজার', shortName: 'পাহাড়িয়াকান্দি বাজার', en: 'Pahariakandi Bazar', fee: 45, time: '৩০-৪০ মিনিট', union: 'পাহাড়িয়াকান্দি ইউনিয়ন' },
+      { id: 'salimabad', name: 'ছলিমাবাদ বাজার', shortName: 'ছলিমাবাদ বাজার', en: 'Salimabad Bazar', fee: 40, time: '৩০-৩৫ মিনিট', union: 'ছলিমাবাদ ইউনিয়ন' },
+      { id: 'manikpur', name: 'মানিকপুর বাজার', shortName: 'মানিকপুর বাজার', en: 'Manikpur Bazar', fee: 45, time: '৩০-৪০ মিনিট', union: 'মানিকপুর ইউনিয়ন' },
+      { id: 'mayarampur', name: 'মায়ারামপুর ও আশেপাশের বাজার', shortName: 'মায়ারামপুর বাজার', en: 'Mayarampur & Nearby', fee: 40, time: '৩০-৩৫ মিনিট', union: 'বাঞ্ছারামপুর উত্তর/দক্ষিণ' }
+    ];
+
+    const foodCategories = [
+      { id: 'all', name: 'সব খাবার', icon: '🍽️' },
+      { id: 'burger', name: 'বার্গার ও শর্মা', icon: '🍔' },
+      { id: 'biryani', name: 'বিরিয়ানি ও কাচ্চি', icon: '🍛' },
+      { id: 'pizza', name: 'পিৎজা ও চাইনিজ', icon: '🍕' },
+      { id: 'sweets', name: 'মিষ্টি ও বেকারি', icon: '🍮' },
+      { id: 'drinks', name: 'ক্যাফে ও ড্রিংকস', icon: '☕' }
+    ];
+
+    // =========================================================================
+    // 2. INITIAL SHOPS & RESTAURANTS ACROSS BANCHARAMPUR BAZAARS
+    // =========================================================================
+    let shops = [
+      {
+        id: 'ripon-fastfood',
+        name: 'Mr. Ripon Fastfood',
+        owner: 'মোঃ রিপন মিয়া',
+        bazaarId: 'chaifullahkandi',
+        category: 'burger',
+        rating: '4.9',
+        time: '২০-২৫ মিনিট',
+        emoji: '🍔',
+        gradient: 'from-amber-400 to-orange-500',
+        isNew: false,
+        menu: [
+          { id: 101, name: 'স্পেশাল চিকেন চিজ বার্গার', price: 150, emoji: '🍔' },
+          { id: 102, name: 'ক্রিস্পি ফ্রাইড চিকেন (২ পিস)', price: 180, emoji: '🍗' },
+          { id: 103, name: 'চিকেন শর্মা রোল', price: 110, emoji: '🌯' }
+        ]
+      },
+      {
+        id: 'mr-kitchen',
+        name: 'MR. Kitchen Restaurant',
+        owner: 'তানভীর হাসান',
+        bazaarId: 'sadar',
+        category: 'pizza',
+        rating: '4.8',
+        time: '২০-৩০ মিনিট',
+        emoji: '🍕',
+        gradient: 'from-keeta-green to-emerald-700',
+        isNew: false,
+        menu: [
+          { id: 104, name: 'BBQ চিকেন চিজ পিৎজা (৮ ইঞ্চি)', price: 360, emoji: '🍕' },
+          { id: 105, name: 'চাইনিজ ফ্রাইড রাইস প্ল্যাটার', price: 240, emoji: '🍱' }
+        ]
+      },
+      {
+        id: 'sultan-biryani',
+        name: 'বাঞ্ছারামপুর শাহী বিরিয়ানি হাউজ',
+        owner: 'হাজী আব্দুল করিম',
+        bazaarId: 'sadar',
+        category: 'biryani',
+        rating: '4.8',
+        time: '২০-৩০ মিনিট',
+        emoji: '🍛',
+        gradient: 'from-rose-500 to-red-600',
+        isNew: false,
+        menu: [
+          { id: 106, name: 'স্পেশাল খাসির কাচ্চি বিরিয়ানি', price: 320, emoji: '🍲' },
+          { id: 107, name: 'হায়দ্রাবাদী চিকেন দম বিরিয়ানি', price: 220, emoji: '🍛' }
+        ]
+      },
+      {
+        id: 'karikandi-ghat-hotel',
+        name: 'কড়িকান্দি ফেরিঘাট ভোজ বিলাস',
+        owner: 'শফিকুল ইসলাম',
+        bazaarId: 'karikandi',
+        category: 'biryani',
+        rating: '4.7',
+        time: '২৫-৩০ মিনিট',
+        emoji: '🍛',
+        gradient: 'from-teal-500 to-emerald-600',
+        isNew: false,
+        menu: [
+          { id: 108, name: 'স্পেশাল বিফ তেহারি (ফুল)', price: 200, emoji: '🍛' },
+          { id: 109, name: 'মোরগ পোলাও ও বোরহানি', price: 230, emoji: '🍗' }
+        ]
+      },
+      {
+        id: 'rupshadi-sweets',
+        name: 'রূপসদী মিষ্টান্ন ও বেকারি হাউজ',
+        owner: 'নারায়ণ চন্দ্র ঘোষ',
+        bazaarId: 'rupshadi',
+        category: 'sweets',
+        rating: '4.9',
+        time: '২৫-৩০ মিনিট',
+        emoji: '🍮',
+        gradient: 'from-yellow-400 to-amber-500',
+        isNew: false,
+        menu: [
+          { id: 110, name: 'খাঁটি দুধের ক্ষীর রসমালাই (৫০০ গ্রাম)', price: 250, emoji: '🍮' },
+          { id: 111, name: 'মাটির হাঁড়ির শাহী মিষ্টি দই', price: 160, emoji: '🥣' }
+        ]
+      },
+      {
+        id: 'ujanchar-fastfood',
+        name: 'উজানচর ক্যাফে অ্যান্ড ফাস্টফুড',
+        owner: 'সোহেল রানা',
+        bazaarId: 'ujanchar',
+        category: 'burger',
+        rating: '4.7',
+        time: '২৫-৩০ মিনিট',
+        emoji: '🍔',
+        gradient: 'from-orange-500 to-red-500',
+        isNew: false,
+        menu: [
+          { id: 112, name: 'ডাবল প্যাটি চিকেন বার্গার', price: 190, emoji: '🍔' },
+          { id: 113, name: 'চকলেট কোল্ড কফি', price: 100, emoji: '🥤' }
+        ]
+      },
+      {
+        id: 'fardabad-biryani',
+        name: 'ফরদাবাদ রাজকীয় বিরিয়ানি ও কাবাব',
+        owner: 'আবুল কালাম',
+        bazaarId: 'fardabad',
+        category: 'biryani',
+        rating: '4.8',
+        time: '৩০-৪০ মিনিট',
+        emoji: '🍖',
+        gradient: 'from-red-600 to-rose-700',
+        isNew: false,
+        menu: [
+          { id: 114, name: 'চিকেন চাপ ও নান রুটি কম্বো', price: 170, emoji: '🍖' },
+          { id: 115, name: 'স্পেশাল চিকেন বিরিয়ানি', price: 190, emoji: '🍛' }
+        ]
+      },
+      {
+        id: 'chaifullah-sweets',
+        name: 'ছয়ফুল্লাকান্দি রসগোল্লা ও দই ঘর',
+        owner: 'রফিকুল ইসলাম',
+        bazaarId: 'chaifullahkandi',
+        category: 'sweets',
+        rating: '4.8',
+        time: '২০-২৫ মিনিট',
+        emoji: '🍮',
+        gradient: 'from-amber-300 to-yellow-500',
+        isNew: false,
+        menu: [
+          { id: 116, name: 'স্পঞ্জ রসগোল্লা (১ কেজি)', price: 280, emoji: '🍡' },
+          { id: 117, name: 'ঠান্ডা ম্যাঙ্গো লাচ্ছি', price: 80, emoji: '🥤' }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // 3. APPLICATION STATE
+    // =========================================================================
+    let selectedBazaarId = 'all';
+    let selectedCategoryId = 'all';
+    let searchQuery = '';
+    let cart = [];
+    let isPromoApplied = false;
+    let lastRegisteredShopId = null;
+    let hasActiveOrder = false;
+    let trackStep = 1;
+
+    function toBn(num) {
+      const digits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+      return String(num).replace(/\d/g, d => digits[d]);
+    }
+
+    function getBazaarObj(id) {
+      return bancharampurBazaars.find(b => b.id === id) || bancharampurBazaars[0];
+    }
+
+    // =========================================================================
+    // 4. INITIALIZE DROPDOWNS & VIEWS
+    // =========================================================================
+    function populateBazaarDropdowns() {
+      const headerSel = document.getElementById('headerBazaarSelect');
+      headerSel.innerHTML = bancharampurBazaars.map(b =>
+        `<option value="${b.id}">${b.name} ${b.id !== 'all' ? '(৳' + toBn(b.fee) + ')' : ''}</option>`
+      ).join('');
+
+      const specificBazaars = bancharampurBazaars.filter(b => b.id !== 'all');
+      const optionsHtml = specificBazaars.map(b =>
+        `<option value="${b.id}">${b.name} — (${b.union})</option>`
+      ).join('');
+
+      document.getElementById('checkoutBazaarSelect').innerHTML = optionsHtml;
+      document.getElementById('regBazaarSelect').innerHTML = optionsHtml;
+      document.getElementById('checkoutBazaarSelect').value = 'chaifullahkandi';
+      document.getElementById('regBazaarSelect').value = 'chaifullahkandi';
+    }
+
+    function switchMainView(viewName) {
+      document.querySelectorAll('.main-view').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+      const tabs = {
+        customer: { active: 'bg-keeta-dark text-keeta-yellow', inactive: 'bg-slate-100 hover:bg-slate-200 text-slate-800' },
+        dokandar: { active: 'bg-keeta-green text-white ring-2 ring-keeta-green/40', inactive: 'bg-keeta-green hover:bg-keeta-greenDark text-white' },
+        bazaars: { active: 'bg-keeta-dark text-keeta-yellow', inactive: 'bg-slate-100 hover:bg-slate-200 text-slate-800' }
+      };
+
+      Object.keys(tabs).forEach(key => {
+        const btn = document.getElementById(`tabBtn-${key}`);
+        const base = 'main-nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition shrink-0 flex items-center gap-1.5 ';
+        btn.className = base + (key === viewName ? tabs[key].active : tabs[key].inactive);
+      });
+
+      if (viewName === 'bazaars') renderAllBazaarsDirectory();
+      if (viewName === 'dokandar') renderRecentRegisteredList();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================================
+    // 5. CUSTOMER VIEW RENDERING & FILTERING
+    // =========================================================================
+    function renderBazaarPills() {
+      const container = document.getElementById('bazaarQuickPills');
+      container.innerHTML = bancharampurBazaars.map(b => {
+        const active = selectedBazaarId === b.id;
+        return `
+          <button onclick="selectBazaar('${b.id}')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold shrink-0 border transition ${
+            active
+              ? 'bg-keeta-green text-white border-keeta-green shadow-2xs'
+              : 'bg-slate-50 text-slate-700 border-slate-200 hover:border-keeta-yellow hover:bg-amber-50'
+          }">
+            ${b.id === 'all' ? '🌐 ' + b.shortName : '📍 ' + b.shortName}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderFoodCategories() {
+      const container = document.getElementById('foodCategoryPills');
+      container.innerHTML = foodCategories.map(c => {
+        const active = selectedCategoryId === c.id;
+        return `
+          <button onclick="selectFoodCategory('${c.id}')" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-extrabold shrink-0 border transition ${
+            active
+              ? 'bg-keeta-dark text-keeta-yellow border-keeta-dark'
+              : 'bg-white text-slate-700 border-slate-200 hover:border-keeta-green'
+          }">
+            <span>${c.icon}</span>
+            <span>${c.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function renderShopsAndDishes() {
+      const q = searchQuery.toLowerCase().trim();
+      const filteredShops = shops.filter(s => {
+        const matchBazaar = selectedBazaarId === 'all' || s.bazaarId === selectedBazaarId;
+        const matchCat = selectedCategoryId === 'all' || s.category === selectedCategoryId;
+        const bObj = getBazaarObj(s.bazaarId);
+        const matchSearch = !q ||
+          s.name.toLowerCase().includes(q) ||
+          bObj.name.toLowerCase().includes(q) ||
+          s.menu.some(m => m.name.toLowerCase().includes(q));
+        return matchBazaar && matchCat && matchSearch;
+      });
+
+      document.getElementById('heroTotalShopsCount').textContent = `${toBn(shops.length)}+`;
+      document.getElementById('shopResultCount').textContent = `${toBn(filteredShops.length)}টি দোকান`;
+
+      const activeBazaar = getBazaarObj(selectedBazaarId);
+      document.getElementById('activeBazaarHeading').textContent =
+        selectedBazaarId === 'all' ? 'পুরো বাঞ্ছারামপুরের রেস্টুরেন্ট ও ফাস্টফুড শপ' : `${activeBazaar.name}-এর দোকানসমূহ`;
+
+      const shopsGrid = document.getElementById('shopsGrid');
+      if (filteredShops.length === 0) {
+        shopsGrid.innerHTML = `
+          <div class="col-span-full bg-white rounded-3xl p-8 text-center border border-slate-200 space-y-2.5">
+            <div class="text-4xl">🏪</div>
+            <h3 class="font-extrabold text-base text-slate-800">এই বাজারে এখনো কোনো দোকান তালিকাভুক্ত হয়নি</h3>
+            <p class="text-xs text-slate-500 max-w-md mx-auto">আপনি যদি এই বাজারের দোকানদার হন, তবে এখনই ফ্রি রেজিস্ট্রেশন করে আপনার দোকান চালু করতে পারেন!</p>
+            <div class="pt-1 flex justify-center gap-2">
+              <button onclick="switchMainView('dokandar')" class="bg-keeta-green text-white text-xs font-extrabold px-4 py-2.5 rounded-xl">+ দোকান রেজিস্ট্রেশন করুন</button>
+              <button onclick="resetFilters()" class="bg-slate-100 text-slate-700 text-xs font-bold px-4 py-2.5 rounded-xl">সব বাজার দেখুন</button>
+            </div>
+          </div>
+        `;
+      } else {
+        shopsGrid.innerHTML = filteredShops.map(shop => {
+          const bObj = getBazaarObj(shop.bazaarId);
+          return `
+            <div onclick="openShopModal('${shop.id}')" class="cursor-pointer group bg-white rounded-3xl overflow-hidden border border-slate-200/90 hover:border-keeta-green hover:shadow-lg transition-all flex flex-col">
+              <div class="h-28 bg-gradient-to-r ${shop.gradient} p-4 flex items-center justify-between text-white relative">
+                <div class="space-y-1 z-10">
+                  <div class="flex items-center gap-1.5">
+                    <span class="bg-white text-keeta-green text-[10px] font-extrabold px-2 py-0.5 rounded-full">খোলা আছে</span>
+                    ${shop.isNew ? '<span class="bg-keeta-dark text-keeta-yellow text-[10px] font-extrabold px-2 py-0.5 rounded-full">✨ নতুন নিবন্ধিত</span>' : ''}
+                  </div>
+                  <h3 class="font-extrabold text-base sm:text-lg leading-tight drop-shadow-2xs">${shop.name}</h3>
+                </div>
+                <span class="text-4xl sm:text-5xl group-hover:scale-110 transition-transform select-none">${shop.emoji}</span>
+              </div>
+
+              <div class="p-4 flex-1 flex flex-col justify-between space-y-2.5">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-slate-600 truncate">📍 ${bObj.shortName}</span>
+                  <span class="bg-emerald-50 text-keeta-green font-extrabold px-2 py-0.5 rounded-lg shrink-0">${shop.rating} ★</span>
+                </div>
+                <p class="text-[11px] text-slate-500 truncate">
+                  মেনু: ${shop.menu.map(m => m.name).join(' • ')}
+                </p>
+                <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold">
+                  <span class="text-slate-600">🕒 ${shop.time} • 🛵 ৳${toBn(bObj.fee)}</span>
+                  <span class="bg-keeta-yellow group-hover:bg-keeta-yellowHover text-keeta-dark px-3 py-1 rounded-xl font-extrabold">মেনু দেখুন →</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      const allDishes = [];
+      filteredShops.forEach(s => {
+        s.menu.forEach(m => {
+          allDishes.push({ ...m, shopId: s.id, shopName: s.name, bazaarId: s.bazaarId });
+        });
+      });
+
+      const dishesGrid = document.getElementById('popularDishesGrid');
+      dishesGrid.innerHTML = allDishes.slice(0, 6).map(d => {
+        const bObj = getBazaarObj(d.bazaarId);
+        return `
+          <div class="bg-white rounded-2xl p-3.5 border border-slate-200/90 hover:border-keeta-yellow transition flex items-center justify-between gap-3 shadow-2xs">
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-3xl shrink-0">${d.emoji}</span>
+              <div class="min-w-0">
+                <span class="text-[10px] font-extrabold text-keeta-green block truncate">${d.shopName} (${bObj.shortName})</span>
+                <h4 class="font-extrabold text-xs sm:text-sm text-slate-900 truncate">${d.name}</h4>
+                <span class="font-extrabold text-sm text-slate-900 block mt-0.5">৳${toBn(d.price)}</span>
+              </div>
+            </div>
+            <button onclick="addItemToCart(${d.id}, '${d.shopId}')" class="bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark font-extrabold text-xs px-3.5 py-2 rounded-xl shrink-0 transition active:scale-95">
+              + যোগ করুন
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectBazaar(bazaarId) {
+      selectedBazaarId = bazaarId;
+      document.getElementById('headerBazaarSelect').value = bazaarId;
+
+      if (bazaarId !== 'all') {
+        const bObj = getBazaarObj(bazaarId);
+        document.getElementById('checkoutBazaarSelect').value = bazaarId;
+        document.getElementById('cartSelectedBazaarText').textContent = `ডেলিভারি এলাকা: ${bObj.shortName}`;
+      }
+      renderBazaarPills();
+      renderShopsAndDishes();
+      updateCartUI();
+    }
+
+    function handleHeaderBazaarChange() {
+      const val = document.getElementById('headerBazaarSelect').value;
+      selectBazaar(val);
+      if (document.getElementById('view-customer').classList.contains('hidden')) {
+        switchMainView('customer');
+      }
+    }
+
+    function selectFoodCategory(catId) {
+      selectedCategoryId = catId;
+      renderFoodCategories();
+      renderShopsAndDishes();
+    }
+
+    function handleSearch(val) {
+      searchQuery = val;
+      renderShopsAndDishes();
+    }
+
+    function resetFilters() {
+      selectedBazaarId = 'all';
+      selectedCategoryId = 'all';
+      searchQuery = '';
+      document.getElementById('headerBazaarSelect').value = 'all';
+      document.getElementById('customerSearchInput').value = '';
+      renderBazaarPills();
+      renderFoodCategories();
+      renderShopsAndDishes();
+    }
+
+    // =========================================================================
+    // 6. DOKANDAR / MERCHANT SELF-REGISTRATION SYSTEM (LIVE DEMO)
+    // =========================================================================
+    function handleDokandarRegistration(e) {
+      e.preventDefault();
+
+      const shopName = document.getElementById('regShopName').value.trim();
+      const ownerName = document.getElementById('regOwnerName').value.trim();
+      const mobile = document.getElementById('regMobile').value.trim();
+      const category = document.getElementById('regCategory').value;
+      const bazaarId = document.getElementById('regBazaarSelect').value;
+
+      const item1Name = document.getElementById('regItem1Name').value.trim();
+      const item1Price = parseInt(document.getElementById('regItem1Price').value, 10) || 120;
+      const item2Name = document.getElementById('regItem2Name').value.trim();
+      const item2Price = parseInt(document.getElementById('regItem2Price').value, 10) || 150;
+
+      const catEmojiMap = {
+        burger: '🍔',
+        biryani: '🍛',
+        pizza: '🍕',
+        sweets: '🍮',
+        drinks: '☕'
+      };
+
+      const newShopId = 'shop_' + Date.now();
+      const bObj = getBazaarObj(bazaarId);
+
+      const newShopObj = {
+        id: newShopId,
+        name: shopName,
+        owner: ownerName,
+        mobile: mobile,
+        bazaarId: bazaarId,
+        category: category,
+        rating: '5.0',
+        time: bObj.time,
+        emoji: catEmojiMap[category] || '🍽️',
+        gradient: 'from-keeta-green to-teal-700',
+        isNew: true,
+        menu: [
+          { id: Date.now() + 1, name: item1Name, price: item1Price, emoji: catEmojiMap[category] || '🍔' },
+          { id: Date.now() + 2, name: item2Name, price: item2Price, emoji: '🍽️' }
+        ]
+      };
+
+      shops.unshift(newShopObj);
+      lastRegisteredShopId = bazaarId;
+
+      document.getElementById('dokandarRegForm').reset();
+      document.getElementById('regBazaarSelect').value = bazaarId;
+
+      const banner = document.getElementById('dokandarSuccessBanner');
+      document.getElementById('dokandarSuccessMsg').innerHTML =
+        `<strong>"${shopName}"</strong> এখন <strong>${bObj.name}</strong>-এর তালিকায় যুক্ত হয়েছে এবং কাস্টমাররা আপনার <strong>${item1Name} (৳${toBn(item1Price)})</strong> ও <strong>${item2Name} (৳${toBn(item2Price)})</strong> অর্ডার করতে পারবেন!`;
+      banner.classList.remove('hidden');
+      banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      renderRecentRegisteredList();
+      renderShopsAndDishes();
+      showToast(`🎉 "${shopName}" সফলভাবে রেজিস্ট্রেশন ও লাইভ হয়েছে!`);
+    }
+
+    function goToNewlyRegisteredShop() {
+      switchMainView('customer');
+      if (lastRegisteredShopId) {
+        selectBazaar(lastRegisteredShopId);
+      }
+    }
+
+    function renderRecentRegisteredList() {
+      const listEl = document.getElementById('recentRegisteredList');
+      listEl.innerHTML = shops.map(s => {
+        const bObj = getBazaarObj(s.bazaarId);
+        return `
+          <div class="flex items-center justify-between p-2.5 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="text-2xl">${s.emoji}</span>
+              <div class="min-w-0">
+                <span class="font-extrabold text-slate-900 block truncate">${s.name}</span>
+                <span class="text-[11px] text-slate-500 block truncate">📍 ${bObj.shortName} • মালিক: ${s.owner}</span>
+              </div>
+            </div>
+            <span class="bg-emerald-100 text-keeta-green text-[10px] font-extrabold px-2 py-0.5 rounded-full shrink-0">Active</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // =========================================================================
+    // 7. ALL 14 BAZAARS & UNIONS DIRECTORY RENDERING
+    // =========================================================================
+    function renderAllBazaarsDirectory() {
+      const grid = document.getElementById('allBazaarsDirectoryGrid');
+      const specificBazaars = bancharampurBazaars.filter(b => b.id !== 'all');
+
+      grid.innerHTML = specificBazaars.map(b => {
+        const shopCount = shops.filter(s => s.bazaarId === b.id).length;
+        return `
+          <div class="bg-white rounded-3xl p-5 border border-slate-200/90 hover:border-keeta-green hover:shadow-md transition flex flex-col justify-between space-y-4">
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <span class="bg-emerald-50 text-keeta-green text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">ডেলিভারি সচল</span>
+                <span class="text-xs font-extrabold text-slate-700">🛵 ৳${toBn(b.fee)}</span>
+              </div>
+              <h3 class="font-extrabold text-base text-slate-900 pt-1">📍 ${b.name}</h3>
+              <p class="text-xs font-semibold text-slate-500">${b.en}</p>
+              <p class="text-[11px] text-slate-500">ইউনিয়ন: ${b.union} • সময়: ${b.time}</p>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+              <span class="text-xs font-extrabold text-slate-800">${toBn(shopCount)}টি রেজিস্টার্ড দোকান</span>
+              <button onclick="openBazaarInCustomerView('${b.id}')" class="bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark text-xs font-extrabold px-3 py-1.5 rounded-xl transition">
+                খাবার দেখুন →
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openBazaarInCustomerView(bazaarId) {
+      switchMainView('customer');
+      selectBazaar(bazaarId);
+    }
+
+    // =========================================================================
+    // 8. SHOP MENU MODAL, CART & GUEST CHECKOUT
+    // =========================================================================
+    function openShopModal(shopId) {
+      const shop = shops.find(s => s.id === shopId);
+      const bObj = getBazaarObj(shop.bazaarId);
+
+      document.getElementById('modalShopEmoji').textContent = shop.emoji;
+      document.getElementById('modalShopName').textContent = shop.name;
+      document.getElementById('modalShopRating').textContent = `${shop.rating} ★`;
+      document.getElementById('modalShopBazaar').textContent = `📍 ${bObj.name} • 🕒 ${shop.time}`;
+
+      const container = document.getElementById('modalShopMenuContainer');
+      container.innerHTML = shop.menu.map(item => `
+        <div class="bg-white rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center text-2xl shrink-0">${item.emoji}</span>
+            <div class="min-w-0">
+              <h4 class="font-extrabold text-sm text-slate-900 truncate">${item.name}</h4>
+              <span class="font-extrabold text-xs text-keeta-green">৳${toBn(item.price)}</span>
+            </div>
+          </div>
+          <button onclick="addItemToCart(${item.id}, '${shop.id}')" class="bg-keeta-yellow hover:bg-keeta-yellowHover text-keeta-dark font-extrabold text-xs px-3.5 py-2 rounded-xl shrink-0 transition active:scale-95">
+            + কার্টে যোগ করুন
+          </button>
+        </div>
+      `).join('');
+
+      const modal = document.getElementById('shopMenuModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeShopModal() {
+      const modal = document.getElementById('shopMenuModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function addItemToCart(itemId, shopId) {
+      const shop = shops.find(s => s.id === shopId);
+      const item = shop.menu.find(m => m.id === itemId);
+      if (!item) return;
+
+      const existing = cart.find(c => c.id === itemId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...item, shopName: shop.name, qty: 1 });
+      }
+      updateCartUI();
+      showToast(`"${item.name}" কার্টে যোগ হয়েছে!`);
+    }
+
+    function updateCartQty(itemId, delta) {
+      const idx = cart.findIndex(c => c.id === itemId);
+      if (idx === -1) return;
+      cart[idx].qty += delta;
+      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      updateCartUI();
+    }
+
+    function syncCheckoutBazaar() {
+      const bId = document.getElementById('checkoutBazaarSelect').value;
+      const bObj = getBazaarObj(bId);
+      document.getElementById('cartSelectedBazaarText').textContent = `ডেলিভারি এলাকা: ${bObj.shortName}`;
+      updateCartUI();
+    }
+
+    function applyPromoCode() {
+      isPromoApplied = true;
+      const btn = document.getElementById('cartPromoBtn');
+      btn.textContent = 'প্রয়োগ হয়েছে ✓';
+      btn.classList.replace('bg-keeta-green', 'bg-keeta-dark');
+      updateCartUI();
+      showToast('প্রোমো কোড FIRSTFREE চালু হয়েছে! ডেলিভারি ফ্রি।');
+    }
+
+    function togglePromoCode() {
+      isPromoApplied = !isPromoApplied;
+      const btn = document.getElementById('cartPromoBtn');
+      if (isPromoApplied) {
+        btn.textContent = 'প্রয়োগ হয়েছে ✓';
+        btn.classList.replace('bg-keeta-green', 'bg-keeta-dark');
+      } else {
+        btn.textContent = 'প্রয়োগ করুন';
+        btn.classList.replace('bg-keeta-dark', 'bg-keeta-green');
+      }
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const totalItems = cart.reduce((s, i) => s + i.qty, 0);
+      document.getElementById('cartBadgeCount').textContent = `${toBn(totalItems)} আইটেম`;
+
+      const emptyState = document.getElementById('emptyCartState');
+      const itemsContainer = document.getElementById('cartItemsContainer');
+      const checkoutSection = document.getElementById('cartCheckoutSection');
+
+      if (cart.length === 0) {
+        emptyState.classList.remove('hidden');
+        itemsContainer.classList.add('hidden');
+        checkoutSection.classList.add('hidden');
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+      itemsContainer.classList.remove('hidden');
+      checkoutSection.classList.remove('hidden');
+
+      itemsContainer.innerHTML = cart.map(item => `
+        <div class="flex items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-200/80 text-xs">
+          <div class="min-w-0">
+            <h5 class="font-extrabold text-slate-900 truncate">${item.name}</h5>
+            <span class="text-[11px] text-slate-500 block truncate">${item.shopName} • ৳${toBn(item.price)}</span>
+          </div>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <button onclick="updateCartQty(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-white border border-slate-300 font-bold">-</button>
+            <span class="font-extrabold w-4 text-center">${toBn(item.qty)}</span>
+            <button onclick="updateCartQty(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-keeta-yellow font-bold">+</button>
+          </div>
+        </div>
+      `).join('');
+
+      const checkoutBazaarId = document.getElementById('checkoutBazaarSelect').value || 'chaifullahkandi';
+      const fee = getBazaarObj(checkoutBazaarId).fee;
+      const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+      const discount = isPromoApplied ? fee : 0;
+      const total = subtotal + fee - discount;
+
+      document.getElementById('cartSubtotalText').textContent = `৳${toBn(subtotal)}`;
+      document.getElementById('cartDeliveryText').textContent = `৳${toBn(fee)}`;
+
+      const discRow = document.getElementById('cartDiscountRow');
+      if (isPromoApplied) {
+        discRow.classList.remove('hidden');
+        discRow.classList.add('flex');
+        document.getElementById('cartDiscountText').textContent = `-৳${toBn(discount)}`;
+      } else {
+        discRow.classList.add('hidden');
+      }
+      document.getElementById('cartTotalText').textContent = `৳${toBn(total)}`;
+    }
+
+    function placeCustomerOrder(e) {
+      e.preventDefault();
+      if (cart.length === 0) return;
+
+      const bId = document.getElementById('checkoutBazaarSelect').value;
+      const bObj = getBazaarObj(bId);
+      const orderNum = Math.floor(1000 + Math.random() * 9000);
+
+      document.getElementById('trackModalOrderId').textContent = `অর্ডার আইডি: #KE-${toBn(orderNum)}`;
+      document.getElementById('trackModalDestination').textContent = bObj.name;
+
+      cart = [];
+      updateCartUI();
+
+      hasActiveOrder = true;
+      trackStep = 1;
+      updateTrackStepsUI();
+      document.getElementById('liveTrackBeacon').classList.remove('hidden');
+      openTrackingModal();
+    }
+
+    function openTrackingModal() {
+      if (!hasActiveOrder) {
+        showToast('এখনো কোনো অর্ডার করা হয়নি। আগে খাবার অর্ডার করুন!');
+        return;
+      }
+      const m = document.getElementById('trackingModal');
+      m.classList.remove('hidden');
+      m.classList.add('flex');
+    }
+
+    function closeTrackingModal() {
+      const m = document.getElementById('trackingModal');
+      m.classList.add('hidden');
+      m.classList.remove('flex');
+    }
+
+    function advanceTrackStep() {
+      trackStep = trackStep < 3 ? trackStep + 1 : 1;
+      updateTrackStepsUI();
+    }
+
+    function updateTrackStepsUI() {
+      for (let i = 2; i <= 3; i++) {
+        const step = document.getElementById(`trStep${i}`);
+        const dot = document.getElementById(`trStep${i}Dot`);
+        if (i <= trackStep) {
+          step.classList.remove('opacity-45');
+          dot.className = 'w-6 h-6 rounded-full bg-keeta-green text-white flex items-center justify-center text-xs font-bold shrink-0';
+          dot.textContent = '✓';
+        } else {
+          step.classList.add('opacity-45');
+          dot.className = 'w-6 h-6 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-xs font-bold shrink-0';
+          dot.textContent = toBn(i);
+        }
+      }
+      document.getElementById('advanceTrackBtn').textContent =
+        trackStep === 3 ? 'পুনরায় ট্র্যাকিং দেখুন ↻' : 'পরবর্তী ধাপ দেখুন (Demo) →';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastBanner');
+      t.textContent = msg;
+      t.classList.remove('opacity-0');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => t.classList.add('opacity-0'), 2600);
+    }
+
+    // Boot Application
+    populateBazaarDropdowns();
+    renderBazaarPills();
+    renderFoodCategories();
+    renderShopsAndDishes();
+    updateCartUI();
+  </script>
+</body>
+</html>
